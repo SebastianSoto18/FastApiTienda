@@ -45,5 +45,5 @@ def delete_user(id: int):
 
 @user.put("/users/{id}",status_code=status.HTTP_200_OK,tags=["users"])
 def update_user(id: int, user: User):
-    conn.execute(users.update().where(users.c.id == id).values(name=user.name, email=user.email, phone=user.phone, password=serializer.encrypt(user.password.encode("utf-8"))))
+    conn.execute(users.update().where(users.c.id == id).values(name=user.name, email=user.email, phone=user.phone, password=user.password))
     return Response(status_code=HTTP_200_OK)
