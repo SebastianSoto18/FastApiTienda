@@ -6,7 +6,7 @@ from schemas.user import User
 from schemas.aut_user import validateUser
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_200_OK
 from passlib.context import CryptContext
-from os import getenv
+
 
 
 
