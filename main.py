@@ -22,8 +22,7 @@ app = FastAPI(
         ]
 )
 
-load_dotenv()
-
 app.include_router(user)
 app.include_router(produc)
 
+load_dotenv()
