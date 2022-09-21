@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from os import getenv
 from jwt import exceptions
 from fastapi.responses import JSONResponse
+from config.db import conn
+from models.user import users
 
 def expire_date(days: int):
     date = datetime.now()
@@ -16,7 +18,11 @@ def write_token(data: dict):
 def validate_token(token, output=False):
     try:
         if output:
-            return decode(token, key=getenv("SECRET"), algorithms=["HS256"])
+            data = decode(token, key=getenv("SECRET"), algorithms=["HS256"])
+            user = conn.execute(users.select().where(users.c.email == data["email"])).first()
+            if user == None:
+                return False
+            return {"response":True, "user":user}
         decode(token, key=getenv("SECRET"), algorithms=["HS256"])
     except exceptions.DecodeError:
         return JSONResponse(content={"message":"Invalid token"}, status_code=401)
