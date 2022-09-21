@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from routes.user import user
+from routes.product import produc
+from dotenv import load_dotenv
 
 app = FastAPI(
     title="PedidosRest",
@@ -8,7 +10,20 @@ app = FastAPI(
         {
         "name": "users",
         "description": "Operations with users"
-    }]
+        },
+        {
+        "name": "products",
+        "description": "Operations with products",
+        },
+        {
+        "name": "auth",
+        "description": "auth operations"
+        }
+        ]
 )
+
+load_dotenv()
+
 app.include_router(user)
+app.include_router(produc)
 
