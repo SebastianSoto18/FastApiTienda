@@ -4,4 +4,5 @@ user = APIRouter()
 
 @user.get("/")
 def hello():
-    return {"message": "Hello World"}
+    return {"message": "holi amorcito uwu",
+            "afecto": "te amo"}
