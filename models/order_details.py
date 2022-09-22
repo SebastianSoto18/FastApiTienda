@@ -3,8 +3,6 @@ from sqlalchemy.sql.sqltypes import Integer,Text
 from config.db import Base
 
 
-
-
 class orders_detail(Base):
     __tablename__ = 'orders_detail'
     id = Column(Integer, primary_key=True, autoincrement=True)

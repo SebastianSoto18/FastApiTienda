@@ -1,4 +1,3 @@
-from cgitb import text
 from pydantic import BaseModel
 from typing import Optional
 
