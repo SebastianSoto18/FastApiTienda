@@ -1,14 +1,18 @@
-from sqlalchemy import Table, Column
-from sqlalchemy.sql.sqltypes import Integer, String, Boolean
-from config.db import meta, engine
+from sqlalchemy import  Column
+from sqlalchemy.sql.sqltypes import Integer, String
+from config.db import Base
 
-users = Table("users", meta, 
-        Column("id", Integer, primary_key=True), 
-        Column("name", String(100)), 
-        Column("email", String(150), unique=True), 
-        Column("password", String(255)), 
-        Column("phone", String(11), unique=True),
-        )
 
-meta.create_all(engine)
+
+class users(Base):
+        __tablename__ = 'users'
+        id = Column(Integer, primary_key=True, autoincrement=True)
+        name = Column(String(100))
+        email = Column(String(150))
+        password = Column(String(255))
+        phone = Column(String(20))
+
+        def __repr__(self):
+                return f"User {self.name}"
+
 

@@ -1,74 +1,53 @@
-from fastapi import APIRouter, Response, status, Header
-from config.db import conn
-from functions_jwt import validate_token, write_token
+from fastapi import APIRouter, Response, status, Header, Depends
+#from functions_jwt import validate_token, write_token
 from models.user import users
 from schemas.user import User
 from schemas.aut_user import validateUser
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_200_OK
 from passlib.context import CryptContext
-
-
-
-
-user = APIRouter()
+from config.db import get_db
+from sqlalchemy.orm import Session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-
 def get_password_hash(password):
     return pwd_context.hash(password)
 
+user = APIRouter()
 
-def authenticate_user(username: str, password: str):
-    user = conn.execute(users.select().where(users.c.email == username)).first()
-    if not user:
-        return False
-    if not verify_password(password, user.password):
-        return False
-    return user
-
-def get_user(username: str):
-    user = conn.execute(users.select().where(users.c.email == username)).first()
-    return user
-
-
-@user.post("/login",tags=["auth"])
-def login(user: validateUser):
-    userfind = authenticate_user(user.email, user.password)
+@user.get("/users",tags=["users"])
+def get_users(db:Session=Depends(get_db)):
+        return  db.query(users).all()
     
-    if userfind==None:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+@user.get("/users/{id}",tags=["users"])
+def get_user(id:int,db:Session=Depends(get_db)):
+        data=db.query(users).filter(users.id==id).first()
+        return (data,Response(status_code=status.HTTP_404_NOT_FOUND))[data is None]
     
-    return {"access_token": write_token({"email":userfind[2], "password":userfind[3]}), "token_type": "bearer"}
+@user.post("/users",tags=["users"], status_code=HTTP_201_CREATED)
+def post_user(user:User,db:Session=Depends(get_db)):
+        new_user = users(name=user.name,email=user.email,password=get_password_hash(user.password),phone=user.phone)
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return Response(status_code=status.HTTP_201_CREATED)
+    
+@user.put("/users/{id}",tags=["users"])
+def update_user(id:int,user:User,db:Session=Depends(get_db)):
+        new_user = db.query(users).filter(users.id==id).first()
+        new_user.name = user.name
+        new_user.email = user.email
+        new_user.password = get_password_hash(user.password)
+        new_user.phone = user.phone
+        db.commit()
+        return Response(status_code=status.HTTP_200_OK)
 
-@user.post("/veryfy",tags=["auth"])
-def verify(Autorization: str=Header(None) ):
-    return validate_token(Autorization, output=True)
-
-@user.get("/users",response_model=list[User],tags=["users"])
-def get_users():
-    return conn.execute(users.select()).fetchall()
-
-@user.get("/users/{id}",response_model=User,tags=["users"])
-def get_user(id: int):
-    return conn.execute(users.select().where(users.c.id == id)).first()
-
-@user.post("/users",response_model=User,status_code=HTTP_201_CREATED,tags=["users"])
-def create_user(user: User):
-    new_user = {"name": user.name, "email": user.email, "phone": user.phone, "password": get_password_hash(user.password), "enabled": user.enabled}
-    conn.execute(users.insert().values(new_user))
-    return Response(status_code=HTTP_201_CREATED)
-
-@user.delete("/users/{id}",status_code=status.HTTP_204_NO_CONTENT,tags=["users"])
-def delete_user(id: int):
-    conn.execute(users.delete().where(users.c.id == id))
-    return Response(status_code=HTTP_204_NO_CONTENT)
-
-@user.put("/users/{id}",status_code=status.HTTP_200_OK,tags=["users"])
-def update_user(id: int, user: User):
-    conn.execute(users.update().where(users.c.id == id).values(name=user.name, email=user.email, phone=user.phone, password=user.password))
-    return Response(status_code=HTTP_200_OK)
+@user.delete("/users/{id}",tags=["users"])
+def delete_user(id:int,db:Session=Depends(get_db)):
+        db.query(users).filter(users.id==id).delete()
+        db.commit()
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        

@@ -1,7 +1,14 @@
 from fastapi import FastAPI
 from routes.user import user
 from routes.product import produc
+from routes.order import ordersRouter
 from dotenv import load_dotenv
+from config.db import Base, engine
+
+
+def create_Tables():
+    Base.metadata.create_all(bind=engine)
+create_Tables()
 
 app = FastAPI(
     title="PedidosRest",
@@ -16,13 +23,13 @@ app = FastAPI(
         "description": "Operations with products",
         },
         {
-        "name": "auth",
-        "description": "auth operations"
+        "name": "orders",
+        "description": "orders operation"
         }
         ]
 )
 
 app.include_router(user)
 app.include_router(produc)
-
+app.include_router(ordersRouter)
 load_dotenv()

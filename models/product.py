@@ -1,14 +1,17 @@
-from sqlalchemy import Table, Column
-from sqlalchemy.sql.sqltypes import Integer, String, Text
-from config.db import meta, engine
+from sqlalchemy import  Column
+from sqlalchemy.sql.sqltypes import Integer, String
+from config.db import Base
 
 
-products = Table("products",meta,
-                    Column("id", Integer, primary_key=True),
-                    Column("name", String(20)),
-                    Column("code", String(8), unique=True),
-                    Column("Quantity", Integer),    
-                    Column("price", Integer)
-                    )
 
-meta.create_all(engine)
+class products(Base):
+    __tablename__ = 'products'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(20))
+    code = Column(String(8), unique=True)
+    Quantity = Column(Integer)
+    price = Column(Integer)
+
+    
+    def __repr__(self):
+        return f"Product {self.name}"

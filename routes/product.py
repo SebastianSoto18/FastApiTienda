@@ -1,31 +1,43 @@
-from fastapi import APIRouter, Response, status
-from config.db import conn
+from fastapi import APIRouter, Response, status, Depends
 from models.product import products
 from schemas.product import Product
+from config.db import get_db
+from sqlalchemy.orm import Session
 
 
-produc= APIRouter()
+produc = APIRouter()
 
-@produc.get("/products",response_model=list[Product],tags=["products"])
-def get_produts():
-    return conn.execute(products.select()).fetchall()
 
-@produc.get("/products/{id}",response_model=Product,tags=["products"])
-def get_product(id: int):
-    return conn.execute(products.select().where(products.c.id == id)).first()
+@produc.get("/products",tags=["products"])
+def get_products(db:Session=Depends(get_db)):
+        return  db.query(products).all()
+    
+@produc.get("/products/{id}",tags=["products"])
+def get_product(id:int,db:Session=Depends(get_db)):
+        data=db.query(products).filter(products.id==id).first()
+        return (data,Response(status_code=status.HTTP_404_NOT_FOUND))[data is None]
 
-@produc.post("/products",response_model=Product,status_code=status.HTTP_201_CREATED,tags=["products"])
-def create_product(product: Product):
-    new_product = {"name": product.name, "code": product.code, "Quantity": product.Quantity, "price": product.price}
-    conn.execute(products.insert().values(new_product))
-    return Response(status_code=status.HTTP_201_CREATED)
+@produc.post("/products",tags=["products"], status_code=status.HTTP_201_CREATED)
+def create_prodcut(product:Product,db:Session=Depends(get_db)):
+        new_product = products(name=product.name,code=product.code,Quantity=product.Quantity,price=product.price)
+        db.add(new_product)
+        db.commit()
+        db.refresh(new_product)
+        return Response(status_code=status.HTTP_201_CREATED)
 
-@produc.delete("/products/{id}",status_code=status.HTTP_204_NO_CONTENT,tags=["products"])
-def delete_product(id: int):
-    conn.execute(products.delete().where(products.c.id == id))
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+@produc.put("/products/{id}",tags=["products"])
+def update_product(id:int,product:Product,db:Session=Depends(get_db)):
+        new_product = db.query(products).filter(products.id==id).first()
+        new_product.name = product.name
+        new_product.code = product.code
+        new_product.Quantity = product.Quantity
+        new_product.price = product.price
+        db.commit()
+        return Response(status_code=status.HTTP_200_OK)
 
-@produc.put("/products/{id}",status_code=status.HTTP_200_OK,tags=["products"])
-def update_product(id: int, product: Product):
-    conn.execute(products.update().where(products.c.id == id).values(name=product.name, code=product.code, quantity=product.quantity, price=product.price))
-    return Response(status_code=status.HTTP_200_OK)
+@produc.delete("/products/{id}",tags=["products"])
+def delete_product(id:int,db:Session=Depends(get_db)):
+        db.query(products).filter(products.id==id).delete()
+        db.commit()
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    

@@ -1,16 +1,24 @@
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 #base de datos produccion
-SQLALCHEMY_DATABASE_URL ="mysql+pymysql://sql10521232:QUikh66RIU@sql10.freemysqlhosting.net:3306/sql10521232"
+SQLALCHEMY_DATABASE_URL ="mysql+pymysql://sql10521480:tMCwRdCZgc@sql10.freemysqlhosting.net:3306/sql10521480"
 engine=create_engine(SQLALCHEMY_DATABASE_URL)
-meta=MetaData()
-conn = engine.connect()
+sessionlocal=sessionmaker(autocommit=False,autoflush=False,bind=engine)
+Base = declarative_base()
 
 
 #base de datos desarrollo
 #SQLALCHEMY_DATABASE_URL ="mysql+pymysql://root:78945612310@localhost:3306/tienda"
 #engine=create_engine(SQLALCHEMY_DATABASE_URL)
-#meta=MetaData()
-#conn = engine.connect()
+#sessionlocal=sessionmaker(autocommit=False,autoflush=False,bind=engine)
+#Base = declarative_base()
+
+
+def get_db():
+    db = sessionlocal()
+    try:
+        yield db
+    finally:
+        db.close()
