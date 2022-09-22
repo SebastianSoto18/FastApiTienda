@@ -18,6 +18,9 @@ Base = declarative_base()
 #Base = declarative_base()
 
 
+"""
+    It creates a database session, yields it to the caller, and then closes it when the caller is done
+    """
 def get_db():
     db = sessionlocal()
     try:
