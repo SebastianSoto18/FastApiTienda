@@ -4,18 +4,18 @@ from sqlalchemy.orm import sessionmaker
 
 #base de datos produccion
 # Creating a connection to the database.
-#SQLALCHEMY_DATABASE_URL ="mysql+pymysql://sql10521480:tMCwRdCZgc@sql10.freemysqlhosting.net:3306/sql10521480"
-#engine=create_engine(SQLALCHEMY_DATABASE_URL)
-#sessionlocal=sessionmaker(autocommit=False,autoflush=False,bind=engine)
-#Base = declarative_base()
+SQLALCHEMY_DATABASE_URL ="mysql+pymysql://sql10521480:tMCwRdCZgc@sql10.freemysqlhosting.net:3306/sql10521480"
+engine=create_engine(SQLALCHEMY_DATABASE_URL)
+sessionlocal=sessionmaker(autocommit=False,autoflush=False,bind=engine)
+Base = declarative_base()
 
 
 #base de datos desarrollo
 # Creating a connection to the database.
-SQLALCHEMY_DATABASE_URL ="mysql+pymysql://root:78945612310@localhost:3306/tienda"
-engine=create_engine(SQLALCHEMY_DATABASE_URL)
-sessionlocal=sessionmaker(autocommit=False,autoflush=False,bind=engine)
-Base = declarative_base()
+#SQLALCHEMY_DATABASE_URL ="mysql+pymysql://root:78945612310@localhost:3306/tienda"
+#engine=create_engine(SQLALCHEMY_DATABASE_URL)
+#sessionlocal=sessionmaker(autocommit=False,autoflush=False,bind=engine)
+#Base = declarative_base()
 
 
 def get_db():
