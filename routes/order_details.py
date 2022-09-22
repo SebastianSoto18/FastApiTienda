@@ -7,6 +7,15 @@ from models.order_details import orders_detail
 
 schemas=APIRouter()
 
+"""
+    It returns the data if it exists, otherwise it returns a 404 error
+    
+    :param id_venta: The id of the order
+    :type id_venta: int
+    :param db: Session = Depends(get_db)
+    :type db: Session
+    :return: The data is being returned.
+    """
 @schemas.get("/order_details/{id_venta}",tags=["order_details"])
 def get_order_details(id_venta:int,db:Session=Depends(get_db)):
     data = db.query(orders_detail).filter(orders_detail.order_id==id_venta).all()
