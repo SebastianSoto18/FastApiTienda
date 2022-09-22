@@ -30,13 +30,23 @@ def get_user(id:int,db:Session=Depends(get_db)):
 @user.post("/users",tags=["users"], status_code=HTTP_201_CREATED)
 def post_user(user:User,db:Session=Depends(get_db)):
         new_user = users(name=user.name,email=user.email,password=get_password_hash(user.password),phone=user.phone)
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-        return Response(status_code=status.HTTP_201_CREATED)
+        try:
+            if(not(db.query(users).filter(users.email==user.email).first() is None)):
+                raise Exception
+            db.add(new_user)
+            db.commit()
+            db.refresh(new_user)
+            return Response(status_code=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(status_code=status.HTTP_400_BAD_REQUEST, content="email or phone already exists")
+            raise
     
 @user.put("/users/{id}",tags=["users"])
 def update_user(id:int,user:User,db:Session=Depends(get_db)):
+    
+        if db.query(users).filter(users.id==id).first() is None:
+            return Response(status_code=status.HTTP_404_NOT_FOUND)
+        
         new_user = db.query(users).filter(users.id==id).first()
         new_user.name = user.name
         new_user.email = user.email
@@ -47,7 +57,10 @@ def update_user(id:int,user:User,db:Session=Depends(get_db)):
 
 @user.delete("/users/{id}",tags=["users"])
 def delete_user(id:int,db:Session=Depends(get_db)):
-        db.query(users).filter(users.id==id).delete()
+        data=db.query(users).filter(users.id==id)
+        if db.query(users).filter(users.id==id).first() is None:
+            return Response(status_code=status.HTTP_404_NOT_FOUND)
+        data.delete()
         db.commit()
         return Response(status_code=status.HTTP_204_NO_CONTENT)
         

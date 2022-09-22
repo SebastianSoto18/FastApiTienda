@@ -47,6 +47,12 @@ def create_order(order:Order,db:Session=Depends(get_db)):
 
 @ordersRouter.delete("/orders/{id}",tags=["orders"])
 def delete_order(id:int,db:Session=Depends(get_db)):
-    db.query(orders).filter(orders.id==id).delete()
+    
+    data=db.query(orders).filter(orders.id==id)
+    
+    if db.query(orders).filter(orders.id==id).first():
+        Response(status_code=status.HTTP_404_NOT_FOUND)
+        
+    data.delete()
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

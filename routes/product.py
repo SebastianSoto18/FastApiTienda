@@ -20,24 +20,37 @@ def get_product(id:int,db:Session=Depends(get_db)):
 @produc.post("/products",tags=["products"], status_code=status.HTTP_201_CREATED)
 def create_prodcut(product:Product,db:Session=Depends(get_db)):
         new_product = products(name=product.name,code=product.code,Quantity=product.Quantity,price=product.price)
-        db.add(new_product)
-        db.commit()
-        db.refresh(new_product)
-        return Response(status_code=status.HTTP_201_CREATED)
+        try:
+            db.add(new_product)
+            db.commit()
+            db.refresh(new_product)
+            return Response(status_code=status.HTTP_201_CREATED)
+        except:
+            return Response(status_code=status.HTTP_400_BAD_REQUEST, content="code or name already exists")
 
 @produc.put("/products/{id}",tags=["products"])
 def update_product(id:int,product:Product,db:Session=Depends(get_db)):
+    
+        if db.query(products).filter(products.id==id).first() is None:
+            Response(status_code=status.HTTP_404_NOT_FOUND)
+            
         new_product = db.query(products).filter(products.id==id).first()
         new_product.name = product.name
         new_product.code = product.code
         new_product.Quantity = product.Quantity
         new_product.price = product.price
+        
         db.commit()
         return Response(status_code=status.HTTP_200_OK)
 
 @produc.delete("/products/{id}",tags=["products"])
 def delete_product(id:int,db:Session=Depends(get_db)):
-        db.query(products).filter(products.id==id).delete()
+        data=db.query(products).filter(products.id==id)
+        
+        if db.query(products).filter(products.id==id).first() is None:
+            return Response(status_code=status.HTTP_404_NOT_FOUND)
+        
+        data.delete()
         db.commit()
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     
