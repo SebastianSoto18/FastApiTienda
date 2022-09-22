@@ -18,11 +18,11 @@ def get_password_hash(password):
 
 user = APIRouter()
 
-@user.get("/users",response_class=User,tags=["users"])
+@user.get("/users",tags=["users"])
 def get_users(db:Session=Depends(get_db)):
         return  db.query(users).all()
     
-@user.get("/users/{id}",response_model=User,tags=["users"])
+@user.get("/users/{id}",tags=["users"])
 def get_user(id:int,db:Session=Depends(get_db)):
         data=db.query(users).filter(users.id==id).first()
         return (data,Response(status_code=status.HTTP_404_NOT_FOUND))[data is None]

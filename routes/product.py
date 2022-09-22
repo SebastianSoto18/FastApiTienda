@@ -17,7 +17,7 @@ produc = APIRouter()
         :type db: Session
         :return: A list of products
 """
-@produc.get("/products",response_class=Product,tags=["products"])
+@produc.get("/products",tags=["products"])
 def get_products(db:Session=Depends(get_db)):
         return  db.query(products).all()
 
@@ -31,7 +31,7 @@ def get_products(db:Session=Depends(get_db)):
         :type db: Session
         :return: The data is being returned if it is not None.
         """
-@produc.get("/products/{id}",response_class=Product,tags=["products"])
+@produc.get("/products/{id}",tags=["products"])
 def get_product(id:int,db:Session=Depends(get_db)):
         data=db.query(products).filter(products.id==id).first()
         return (data,Response(status_code=status.HTTP_404_NOT_FOUND))[data is None]
