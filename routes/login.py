@@ -19,5 +19,5 @@ def login(user:validateUser,db:Session=Depends(get_db)):
     if not verify_password(user.password,data.password):
         return Response(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    return signJWT(data.email)
+    return signJWT(data.id)
 
