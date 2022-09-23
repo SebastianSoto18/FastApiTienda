@@ -12,6 +12,7 @@ loginRouter = APIRouter()
 
 @loginRouter.post("/login",tags=["login"], status_code=status.HTTP_200_OK)
 def login(user:validateUser,db:Session=Depends(get_db)):
+
     data = db.query(users).filter(users.email==user.email).first()
     if data is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)

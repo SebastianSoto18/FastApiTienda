@@ -6,7 +6,7 @@ from routes.login import loginRouter
 from routes.order_details import schemas
 from dotenv import load_dotenv
 from config.db import Base, engine
-
+from fastapi.middleware.cors import CORSMiddleware
 
 
 """
@@ -44,6 +44,18 @@ app = FastAPI(
         }
         ]
 )
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 # Including the routes from the different files.
 
 app.include_router(user)
