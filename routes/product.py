@@ -36,6 +36,24 @@ def get_product(id:int,db:Session=Depends(get_db)):
         data=db.query(products).filter(products.id==id).first()
         return (data,Response(status_code=status.HTTP_404_NOT_FOUND))[data is None]
 
+
+        """
+        It takes a code as a parameter, and returns the product with that code
+        
+        :param code: str - The code of the product to retrieve
+        :type code: str
+        :param db: Session = Depends(get_db)
+        :type db: Session
+        :return: The first product with the code that is passed in the url
+        """
+
+@produc.get("/products/{code}",dependencies=[Depends(JWTBearer())],tags=["products"])
+def get_product_byCode(code:str,db:Session=Depends(get_db)):
+        data=db.query(products).filter(products.code==code).first()
+        return db.query(products).filter(products.code==code).first()
+
+
+
         """
         It creates a new product in the database
         
