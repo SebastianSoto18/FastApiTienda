@@ -5,6 +5,7 @@ from models.order_details import orders_detail
 from schemas.order import Order
 from config.db import get_db
 from sqlalchemy.orm import Session
+from auth.auth_barrer import JWTBearer
 
 
 # It creates a new router.
@@ -18,7 +19,7 @@ ordersRouter = APIRouter()
     :type db: Session
     :return: All the orders in the database
 """
-@ordersRouter.get("/orders",tags=["orders"])
+@ordersRouter.get("/orders",dependencies=[Depends(JWTBearer())],tags=["orders"])
 def get_orders(db:Session=Depends(get_db)):
         return  db.query(orders).all()
     
@@ -32,7 +33,7 @@ def get_orders(db:Session=Depends(get_db)):
     :type db: Session
     :return: the data if it is not None, otherwise it returns a response with status code 404.
 """
-@ordersRouter.get("/orders/client{id_client}",tags=["orders"])
+@ordersRouter.get("/orders/client{id_client}",dependencies=[Depends(JWTBearer())],tags=["orders"])
 def get_order_by_client(id_client:int,db:Session=Depends(get_db)):
         data=db.query(orders).filter(orders.user_id==id_client).all()
         return (data,Response(status_code=status.HTTP_404_NOT_FOUND))[data is None]
@@ -47,7 +48,7 @@ def get_order_by_client(id_client:int,db:Session=Depends(get_db)):
     :type db: Session
     :return: The data or a 404 response
 """
-@ordersRouter.get("/orders/{id}",tags=["orders"])
+@ordersRouter.get("/orders/{id}",dependencies=[Depends(JWTBearer())],tags=["orders"])
 def get_order(id:int,db:Session=Depends(get_db)):
     data = db.query(orders).filter(orders.id==id).first()
     return (data,Response(status_code=status.HTTP_404_NOT_FOUND))[data is None]
@@ -61,7 +62,7 @@ def get_order(id:int,db:Session=Depends(get_db)):
     :type db: Session
     :return: a response with a status code of 201.
     """
-@ordersRouter.post("/orders",tags=["orders"], status_code=status.HTTP_201_CREATED)
+@ordersRouter.post("/orders",tags=["orders"],dependencies=[Depends(JWTBearer())] ,status_code=status.HTTP_201_CREATED)
 def create_order(order:Order,db:Session=Depends(get_db)):
     new_order = orders(user_id=order.user_id,client_name=order.client_name,client_phone=order.client_phone,client_address=order.client_address,products=order.products,quantity_per_products=order.quantity_per_products,total=order.total,status=order.status)
     db.add(new_order)
@@ -90,7 +91,7 @@ def create_order(order:Order,db:Session=Depends(get_db)):
     :param db: This is the database session that we will use to query the database
     :type db: Session
     """
-@ordersRouter.delete("/orders/{id}",tags=["orders"])
+@ordersRouter.delete("/orders/{id}",dependencies=[Depends(JWTBearer())],tags=["orders"])
 def delete_order(id:int,db:Session=Depends(get_db)):
     data=db.query(orders).filter(orders.id==id)
     

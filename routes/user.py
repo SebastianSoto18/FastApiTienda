@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Response, status,  Depends
-#from functions_jwt import validate_token, write_token
 from models.user import users
 from schemas.user import User
-from schemas.aut_user import validateUser
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_200_OK
 from passlib.context import CryptContext
 from config.db import get_db
 from sqlalchemy.orm import Session
+from auth.auth_barrer import JWTBearer
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -18,11 +17,11 @@ def get_password_hash(password):
 
 user = APIRouter()
 
-@user.get("/users",tags=["users"])
+@user.get("/users",dependencies=[Depends(JWTBearer())],tags=["users"])
 def get_users(db:Session=Depends(get_db)):
         return  db.query(users).all()
     
-@user.get("/users/{id}",tags=["users"])
+@user.get("/users/{id}",dependencies=[Depends(JWTBearer())],tags=["users"])
 def get_user(id:int,db:Session=Depends(get_db)):
         data=db.query(users).filter(users.id==id).first()
         return (data,Response(status_code=status.HTTP_404_NOT_FOUND))[data is None]
@@ -41,7 +40,7 @@ def post_user(user:User,db:Session=Depends(get_db)):
             return Response(status_code=status.HTTP_400_BAD_REQUEST, content="email or phone already exists")
             raise
     
-@user.put("/users/{id}",tags=["users"],status_code=HTTP_200_OK)
+@user.put("/users/{id}",tags=["users"],dependencies=[Depends(JWTBearer())],status_code=HTTP_200_OK)
 def update_user(id:int,user:User,db:Session=Depends(get_db)):
     
         if db.query(users).filter(users.id==id).first() is None:
@@ -55,7 +54,7 @@ def update_user(id:int,user:User,db:Session=Depends(get_db)):
         db.commit()
         return Response(status_code=status.HTTP_200_OK)
 
-@user.delete("/users/{id}",tags=["users"], status_code=HTTP_204_NO_CONTENT)
+@user.delete("/users/{id}",tags=["users"],dependencies=[Depends(JWTBearer())], status_code=HTTP_204_NO_CONTENT)
 def delete_user(id:int,db:Session=Depends(get_db)):
         data=db.query(users).filter(users.id==id)
         if db.query(users).filter(users.id==id).first() is None:
