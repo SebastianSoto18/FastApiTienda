@@ -25,7 +25,7 @@ class JWTBearer(HTTPBearer):
 
 
         try:
-            payload = decodeJWT(jwtoken)
+            payload = decodeJWT(jwtoken, output=True)
 
         except:
             payload = None
