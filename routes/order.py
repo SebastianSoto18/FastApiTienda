@@ -71,7 +71,7 @@ def create_order(order:Order,db:Session=Depends(get_db)):
     newlist=new_order.products.split(",")
     for index, element in enumerate(newlist):
         product=db.query(products).filter(products.id==int(element)).first()
-        new_order_details = orders_detail(order_id=new_order.id,product_id=product.id,quantity=int(new_order.quantity_per_products.split(",")[index]),price=product.price,name_product=product.name)
+        new_order_details = orders_detail(order_id=new_order.id,product_id=product.id,quantity=int(new_order.quantity_per_products.split(",")[index]),price=product.price,name_product=product.name,total=product.price*int(new_order.quantity_per_products.split(",")[index]))
         if product.Quantity == int(new_order.quantity_per_products.split(",")[index]):
             delete_product(product.id,db)
             continue
