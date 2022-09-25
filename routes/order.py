@@ -6,7 +6,7 @@ from schemas.order import Order
 from config.db import get_db
 from sqlalchemy.orm import Session
 from auth.auth_barrer import JWTBearer
-
+from routes.product import delete_product
 
 # It creates a new router.
 ordersRouter = APIRouter()
@@ -72,10 +72,11 @@ def create_order(order:Order,db:Session=Depends(get_db)):
     for index, element in enumerate(newlist):
         product=db.query(products).filter(products.id==int(element)).first()
         new_order_details = orders_detail(order_id=new_order.id,product_id=product.id,quantity=int(new_order.quantity_per_products.split(",")[index]),price=product.price,name_product=product.name)
+        if product.Quantity == int(new_order.quantity_per_products.split(",")[index]):
+            delete_product(product.id,db)
+            continue
         db.query(products).filter(products.id==int(element)).update({products.Quantity:products.Quantity-int(new_order.quantity_per_products.split(",")[index])})
         db.add(new_order_details)
-        if product.Quantity == int(new_order.quantity_per_products.split(",")[index]):
-            product.delete();
         db.commit()
         db.refresh(new_order_details)
         
