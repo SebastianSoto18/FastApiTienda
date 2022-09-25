@@ -12,7 +12,7 @@ class users(Base):
         email = Column(String(150), unique=True)
         phone = Column(String(20))
         password = Column(String(255))
-
+        address = Column(String(255))
 
         def __repr__(self):
                 return f"User {self.name}"

@@ -28,7 +28,7 @@ def get_user(id:int,db:Session=Depends(get_db)):
     
 @user.post("/users",tags=["users"], status_code=HTTP_201_CREATED)
 def post_user(user:User,db:Session=Depends(get_db)):
-        new_user = users(name=user.name,email=user.email,password=get_password_hash(user.password),phone=user.phone)
+        new_user = users(name=user.name,email=user.email,password=get_password_hash(user.password),phone=user.phone, address=user.address)
         try:
             if(not(db.query(users).filter(users.email==user.email).first() is None)):
                 raise Exception

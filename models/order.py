@@ -14,6 +14,7 @@ class orders (Base):
     quantity_per_products = Column(Text)
     total = Column(Integer)
     status = Column(String(20))
+    date = Column(String(100))
 
     
     def __repr__(self):

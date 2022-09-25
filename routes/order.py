@@ -64,7 +64,7 @@ def get_order(id:int,db:Session=Depends(get_db)):
     """
 @ordersRouter.post("/orders",tags=["orders"],dependencies=[Depends(JWTBearer())] ,status_code=status.HTTP_201_CREATED)
 def create_order(order:Order,db:Session=Depends(get_db)):
-    new_order = orders(user_id=order.user_id,client_name=order.client_name,client_phone=order.client_phone,client_address=order.client_address,products=order.products,quantity_per_products=order.quantity_per_products,total=order.total,status=order.status)
+    new_order = orders(user_id=order.user_id,client_name=order.client_name,client_phone=order.client_phone,client_address=order.client_address,products=order.products,quantity_per_products=order.quantity_per_products,total=order.total,status=order.status, date=order.date)
     db.add(new_order)
     db.commit()
     db.refresh(new_order)
