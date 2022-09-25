@@ -71,12 +71,13 @@ def create_order(order:Order,db:Session=Depends(get_db)):
     newlist=new_order.products.split(",")
     for index, element in enumerate(newlist):
         product=db.query(products).filter(products.id==int(element)).first()
-        db.query(products).filter(products.id==int(element)).update({products.Quantity:products.Quantity-int(new_order.quantity_per_products.split(",")[index])})
         new_order_details = orders_detail(order_id=new_order.id,product_id=product.id,quantity=int(new_order.quantity_per_products.split(",")[index]),price=product.price,name_product=product.name)
+        db.query(products).filter(products.id==int(element)).update({products.Quantity:products.Quantity-int(new_order.quantity_per_products.split(",")[index])})
         db.add(new_order_details)
+        if product.Quantity == int(new_order.quantity_per_products.split(",")[index]):
+            product.delete();
         db.commit()
         db.refresh(new_order_details)
-        print(new_order_details)
         
     return Response(status_code=status.HTTP_201_CREATED)
 
