@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 #base de datos produccion
 # Creating a connection to the database.
-SQLALCHEMY_DATABASE_URL ="mysql+pymysql://sql10522570:DlPQbFMC8Q@sql10.freemysqlhosting.net:3306/sql10522570"
+SQLALCHEMY_DATABASE_URL ="mysql+pymysql://sql10524254:F6rxHvwcav@sql10.freemysqlhosting.net:3306/sql10524254"
 engine=create_engine(SQLALCHEMY_DATABASE_URL)
 sessionlocal=sessionmaker(autocommit=False,autoflush=False,bind=engine)
 Base = declarative_base()
