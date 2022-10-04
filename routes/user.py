@@ -42,7 +42,6 @@ def post_user(user:User,db:Session=Depends(get_db)):
     
 @user.put("/users/{id}",tags=["users"],dependencies=[Depends(JWTBearer())],status_code=HTTP_200_OK)
 def update_user(id:int,user:User,db:Session=Depends(get_db)):
-    
         if db.query(users).filter(users.id==id).first() is None:
             return Response(status_code=status.HTTP_404_NOT_FOUND)
         

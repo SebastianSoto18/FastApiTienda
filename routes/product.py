@@ -67,7 +67,7 @@ def get_product_byCode(code:str,db:Session=Depends(get_db)):
 def create_prodcut(product:Product,db:Session=Depends(get_db)):
         new_product = products(name=product.name,code=product.code,Quantity=product.Quantity,price=product.price)
         try:
-                if(not(db.query(products).filter(products.email==new_product.code).first() is None)):
+                if(not(db.query(products).filter(products.code==new_product.code).first() is None)):
                         raise Exception
                 db.add(new_product)
                 db.commit()
